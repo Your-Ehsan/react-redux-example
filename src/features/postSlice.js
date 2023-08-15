@@ -54,4 +54,4 @@ const postSlice = createSlice({
   },
 });
 
-export default postSlice.reducer;
+export default postSlice;

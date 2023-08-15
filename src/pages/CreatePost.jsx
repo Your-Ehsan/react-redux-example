@@ -5,46 +5,41 @@ import { addPost } from "../features/postSlice";
 
 const CreatePost = () => {
   // Set the initial state for the form
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [addPostRequestStatus, setAddPostRequestStatus] = useState("idle");
-
-  // Get the dispatch function
-  const dispatch = useDispatch();
-
-  // Get the navigate function [replace the history.push() method]
-  const navigate = useNavigate();
-
-  // Handle form field value changes
-  const onTitleChange = (e) => setTitle(e.target.value);
-  const onBodyChange = (e) => setBody(e.target.value);
-
-  /* 
+  const [title, setTitle] = useState(""),
+    [body, setBody] = useState(""),
+    [addPostRequestStatus, setAddPostRequestStatus] = useState("idle"),
+    // Get the dispatch function
+    dispatch = useDispatch(),
+    // Get the navigate function [replace the history.push() method]
+    navigate = useNavigate(),
+    // Handle form field value changes
+    onTitleChange = (e) => setTitle(e.target.value),
+    onBodyChange = (e) => setBody(e.target.value),
+    /* 
    Get the Boolean value based on whether the form is empty or not && the post request status.
    We use the Boolean value returned to toggle the disbale status submit button
  */
-  const canSavePost =
-    [title, body].every(Boolean) && addPostRequestStatus === "idle";
+    canSavePost =
+      [title, body].every(Boolean) && addPostRequestStatus === "idle",
+    // Handle form submission
+    handleAddPost = async (e) => {
+      e.preventDefault();
+      const post = { title, body };
+      if (canSavePost) {
+        try {
+          setAddPostRequestStatus("pending");
+          await dispatch(addPost(post)).unwrap();
+          setTitle("");
+          setBody("");
 
-  // Handle form submission
-  const handleAddPost = async (e) => {
-    e.preventDefault();
-    const post = { title, body };
-    if (canSavePost) {
-      try {
-        setAddPostRequestStatus("pending");
-        await dispatch(addPost(post)).unwrap();
-        setTitle("");
-        setBody("");
-
-        navigate("/");
-      } catch (err) {
-        console.error("Unable to create post:", err);
-      } finally {
-        setAddPostRequestStatus("idle");
+          navigate("/");
+        } catch (err) {
+          console.error("Unable to create post:", err);
+        } finally {
+          setAddPostRequestStatus("idle");
+        }
       }
-    }
-  };
+    };
 
   return (
     <div className="">
@@ -59,25 +54,27 @@ const CreatePost = () => {
                 Post-ironic portland shabby chic echo park, banjo fashion axe
               </p>
               <div className="relative mb-4">
-                <label htmlFor="email" className="leading-7 text-sm ">
+                <label htmlFor="title" className="leading-7 text-sm ">
                   Title
                 </label>
                 <input
                   type="text"
-                  id="email"
-                  name="email"
+                  id="title"
+                  name="title"
+                  required
                   className="w-full  rounded border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-900 text-base outline-none  py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                   onChange={onTitleChange}
                   value={title}
                 />
               </div>
               <div className="relative mb-4">
-                <label htmlFor="message" className="leading-7 text-sm ">
+                <label htmlFor="body" className="leading-7 text-sm ">
                   Body
                 </label>
                 <textarea
-                  id="message"
-                  name="message"
+                  required
+                  id="body"
+                  name="body"
                   className="w-full  rounded border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-900 h-32 text-base outline-none  py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
                   onChange={onBodyChange}
                   value={body}
@@ -85,6 +82,7 @@ const CreatePost = () => {
               </div>
               <div className="flex justify-center gap-4">
                 <button
+                  type="reset"
                   className=" bg-gray-200 border-0 py-2 px-6 focus:outline-none active:bg-gray-300 rounded text-lg text-slate-400"
                   onClick={() => {
                     navigate("/");
@@ -95,6 +93,7 @@ const CreatePost = () => {
                   Cancel
                 </button>
                 <button
+                  type="submit"
                   className=" bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg text-white"
                   disabled={!canSavePost}
                 >
